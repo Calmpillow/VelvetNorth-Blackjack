@@ -1,0 +1,16 @@
+"use strict";
+const fs = require("node:fs");
+const path = require("node:path");
+const root = path.resolve(__dirname, "..");
+const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
+const js = fs.readFileSync(path.join(root, "game.js"), "utf8");
+const ids = new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]));
+const duplicates = [...html.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]).filter((id, i, a) => a.indexOf(id) !== i);
+if (duplicates.length) throw new Error("Duplicate HTML ids: " + [...new Set(duplicates)].join(", "));
+const refs = [...js.matchAll(/\$\("([^"]+)"\)/g)].map(m => m[1]);
+const missing = [...new Set(refs.filter(id => !ids.has(id)))];
+if (missing.length) throw new Error("JavaScript references missing HTML ids: " + missing.join(", "));
+for (const id of ["roomList", "privateRoom", "roomPassword", "refreshRooms", "loadingScreen"]) if (!ids.has(id)) throw new Error("Required UI element missing: " + id);
+if (!js.includes("const shapeCount=10")) throw new Error("Expected 10 style silhouettes per accessory category.");
+if (!html.includes("config.js") || !html.includes("game.js")) throw new Error("Frontend scripts are not linked.");
+console.log(`Static validation passed: ${ids.size} unique HTML IDs; ${new Set(refs).size} JS element references; all required multiplayer controls found.`);

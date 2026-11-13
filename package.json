@@ -1,0 +1,18 @@
+{
+  "name": "velvet-north-multiplayer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Velvet North Blackjack room directory and WebSocket relay",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "check": "node --check server.js && node --check ../game.js && node validate.js",
+    "test": "npm run check"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "ws": "^8.18.3"
+  }
+}
